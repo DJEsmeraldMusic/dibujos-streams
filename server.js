@@ -7,7 +7,14 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: 'https://lab.fronteraespecial.com', // Permitir tu dominio
+        origin: (origin, callback) => {
+            const allowedOrigins = ['https://lab.fronteraespecial.com', 'https://lab.fronteraespecial.com/streams'];
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error('No permitido por CORS'));
+            }
+        },
         methods: ['GET', 'POST'],
         credentials: true
     }
@@ -33,7 +40,7 @@ io.on('connection', (socket) => {
     });
 });
 
-const PORT = process.env.PORT || 10000; // Cambiado de 3000 a 10000
+const PORT = process.env.PORT || 10000; // Puerto configurado a 10000
 server.listen(PORT, () => {
     console.log(`Servidor corriendo en puerto ${PORT}`);
 });
