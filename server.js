@@ -1,28 +1,38 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: 'https://lab.fronteraespacial.com', // Allow your frontend origin
+    origin: 'https://lab.fronteraespacial.com',
     methods: ['GET', 'POST'],
   },
 });
 
+// Serve a default response for favicon to avoid 404
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
 // Middleware to handle CORS
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', 'https://lab.fronteraespacial.com');
-  res.header('Access-Control-Allow-Methods', 'GET, POST');
+  res.header('Access-Control-Allow-Methods', 'GET', 'POST');
   next();
 });
 
-// Socket.IO connection handling (example)
+// Socket.IO connection handling
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
+  });
+  socket.on('draw', (data) => {
+    io.emit('draw', data); // Broadcast to all connected clients
+  });
+  socket.on('clear', () => {
+    io.emit('clear'); // Broadcast clear to all
   });
 });
 
