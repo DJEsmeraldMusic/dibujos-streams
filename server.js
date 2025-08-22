@@ -1,46 +1,31 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
-const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-    cors: {
-        origin: (origin, callback) => {
-            const allowedOrigins = ['https://lab.fronteraespecial.com', 'https://lab.fronteraespecial.com/streams'];
-            if (!origin || allowedOrigins.includes(origin)) {
-                callback(null, true);
-            } else {
-                callback(new Error('No permitido por CORS'));
-            }
-        },
-        methods: ['GET', 'POST'],
-        credentials: true
-    }
+  cors: {
+    origin: 'https://lab.fronteraespacial.com', // Allow your frontend origin
+    methods: ['GET', 'POST'],
+  },
 });
 
-// Servir archivos estáticos (opcional, si alojas el frontend en Render)
-app.use(express.static(path.join(__dirname, 'public')));
+// Middleware to handle CORS
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'https://lab.fronteraespacial.com');
+  res.header('Access-Control-Allow-Methods', 'GET, POST');
+  next();
+});
 
-// Manejar conexiones WebSocket
+// Socket.IO connection handling (example)
 io.on('connection', (socket) => {
-    console.log('Usuario conectado:', socket.id);
-
-    socket.on('draw', (data) => {
-        socket.broadcast.emit('draw', data);
-    });
-
-    socket.on('clear', () => {
-        socket.broadcast.emit('clear');
-    });
-
-    socket.on('disconnect', () => {
-        console.log('Usuario desconectado:', socket.id);
-    });
+  console.log('A user connected:', socket.id);
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+  });
 });
 
-const PORT = process.env.PORT || 10000; // Puerto configurado a 10000
-server.listen(PORT, () => {
-    console.log(`Servidor corriendo en puerto ${PORT}`);
+server.listen(10000, () => {
+  console.log('Servidor corriendo en puerto 10000');
 });
