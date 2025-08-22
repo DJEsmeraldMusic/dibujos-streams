@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ['https://lab.fronteraespacial.com', 'https://streamelements.com'], // Added StreamElements origin
+    origin: ['https://lab.fronteraespacial.com', 'https://streamelements.com'],
     methods: ['GET', 'POST'],
   },
 });
@@ -29,12 +29,10 @@ io.on('connection', (socket) => {
     console.log('User disconnected:', socket.id);
   });
   socket.on('draw', (data) => {
-    console.log('Broadcasting draw event:', data); // Debug log
-    io.emit('draw', data); // Broadcast to all clients
+    io.emit('draw', data); // Broadcast to all clients without logging
   });
   socket.on('clear', () => {
-    console.log('Broadcasting clear event'); // Debug log
-    io.emit('clear'); // Broadcast clear to all
+    io.emit('clear'); // Broadcast clear to all without logging
   });
 });
 
